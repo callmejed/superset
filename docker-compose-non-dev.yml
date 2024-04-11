@@ -36,18 +36,22 @@ services:
     restart: unless-stopped
     volumes:
       - redis:/data
+    networks:
+      - external_network
 
   db:
-    env_file: docker/.env
+    env_file: .env
     image: postgres:15
     container_name: superset_db
     restart: unless-stopped
     volumes:
-      - db_home:/var/lib/postgresql/data
-      - ./docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - ${SUPERSET_DB_VOLUME:-db_home}:/var/lib/postgresql/data
+      # - ./docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    networks:
+      - external_network
 
   superset:
-    env_file: docker/.env
+    env_file: .env
     build:
       <<: *common-build
     container_name: superset_app
@@ -55,28 +59,32 @@ services:
     user: "root"
     restart: unless-stopped
     ports:
-      - 8088:8088
+      - ${SUPERSET_PORT:-8088}:8088
     depends_on: *superset-depends-on
     volumes: *superset-volumes
+    networks:
+      - external_network
 
   superset-init:
     container_name: superset_init
     build:
       <<: *common-build
     command: ["/app/docker/docker-init.sh"]
-    env_file: docker/.env
+    env_file: .env
     depends_on: *superset-depends-on
     user: "root"
     volumes: *superset-volumes
     healthcheck:
       disable: true
+    networks:
+      - external_network
 
   superset-worker:
     build:
       <<: *common-build
     container_name: superset_worker
     command: ["/app/docker/docker-bootstrap.sh", "worker"]
-    env_file: docker/.env
+    env_file: .env
     restart: unless-stopped
     depends_on: *superset-depends-on
     user: "root"
@@ -87,19 +95,28 @@ services:
           "CMD-SHELL",
           "celery -A superset.tasks.celery_app:app inspect ping -d celery@$$HOSTNAME",
         ]
+    networks:
+      - external_network
 
   superset-worker-beat:
     build:
       <<: *common-build
     container_name: superset_worker_beat
     command: ["/app/docker/docker-bootstrap.sh", "beat"]
-    env_file: docker/.env
+    env_file: .env
     restart: unless-stopped
     depends_on: *superset-depends-on
     user: "root"
     volumes: *superset-volumes
+    networks:
+      - external_network
     healthcheck:
       disable: true
+
+networks:
+  external_network:
+    name: ${SUPERSET_DOCKER_NETWORK:-portal-staging-network}
+    external: true
 
 volumes:
   superset_home:
