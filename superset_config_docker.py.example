@@ -1,3 +1,6 @@
+# for docker configurations, copy this file to docker/pythonpath_dev
+# as superset_config_docker.py to overwrite initial config
+
 # import logging
 import os
 
@@ -6,7 +9,7 @@ from flask_caching.backends.filesystemcache import FileSystemCache
 
 # logger = logging.getLogger()
 
-# SUPERSET_PORT = os.getenv("SUPERSET_PORT", "8088")
+SUPERSET_DOCKER_CONTAINER = os.getenv("SUPERSET_DOCKER_CONTAINER", "superset")
 ENABLE_PROXY_FIX = os.getenv("ENABLE_PROXY_FIX")
 
 DATABASE_DIALECT = os.getenv("DATABASE_DIALECT")
@@ -45,7 +48,7 @@ RESULTS_BACKEND = FileSystemCache("/app/superset_home/sqllab")
 CACHE_CONFIG = {
     "CACHE_TYPE": "RedisCache",
     "CACHE_DEFAULT_TIMEOUT": 300,
-    "CACHE_KEY_PREFIX": "superset_",
+    "CACHE_KEY_PREFIX": "superset_staging_",
     "CACHE_REDIS_HOST": REDIS_HOST,
     "CACHE_REDIS_PORT": REDIS_PORT,
     "CACHE_REDIS_DB": REDIS_RESULTS_DB,
@@ -76,12 +79,12 @@ FEATURE_FLAGS = {
 }
 ALERT_REPORTS_NOTIFICATION_DRY_RUN = False
 
-WEBDRIVER_BASEURL = f"http://superset:8088/"
+WEBDRIVER_BASEURL = f"http://{SUPERSET_DOCKER_CONTAINER}:8088/"
 # The base URL for the email report hyperlinks.
-# WEBDRIVER_BASEURL_USER_FRIENDLY = WEBDRIVER_BASEURL
+WEBDRIVER_BASEURL_USER_FRIENDLY = WEBDRIVER_BASEURL
 
 # Flag that controls if limit should be enforced on the CTA (create table as queries).
-# SQLLAB_CTAS_NO_LIMIT = True
+SQLLAB_CTAS_NO_LIMIT = True
 
 # smtp server configuration
 EMAIL_NOTIFICATIONS = os.getenv("EMAIL_NOTIFICATIONS", False)

@@ -58,8 +58,7 @@ ENV LANG=C.UTF-8 \
     SUPERSET_ENV=production \
     FLASK_APP="superset.app:create_app()" \
     PYTHONPATH="/app/pythonpath" \
-    SUPERSET_HOME="/app/superset_home" \
-    SUPERSET_PORT=${SUPERSET_PORT}
+    SUPERSET_HOME="/app/superset_home"
 
 RUN mkdir -p ${PYTHONPATH} superset/static requirements superset-frontend apache_superset.egg-info requirements \
     && useradd --user-group -d ${SUPERSET_HOME} -m --no-log-init --shell /bin/bash superset \
@@ -95,9 +94,9 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 COPY --chmod=755 ./docker/run-server.sh /usr/bin/
 USER superset
 
-HEALTHCHECK CMD curl -f "http://localhost:${SUPERSET_PORT}/health"
+HEALTHCHECK CMD curl -f "http://localhost:8088/health"
 
-EXPOSE ${SUPERSET_PORT}
+EXPOSE 8088
 
 CMD ["/usr/bin/run-server.sh"]
 

@@ -1,10 +1,10 @@
 x-superset-depends-on: &superset-depends-on
-  - db
-  - redis
+  - db-staging
+  - redis-staging
 x-superset-volumes:
   &superset-volumes # /app/pythonpath_docker will be appended to the PYTHONPATH in the final container
   - ./docker:/app/docker
-  - superset_home:/app/superset_home
+  - superset_home-staging:/app/superset_home
 
 x-common-build: &common-build
   context: .
@@ -14,27 +14,27 @@ x-common-build: &common-build
 
 version: "4.0"
 services:
-  redis:
+  redis-staging:
     image: redis:7
     container_name: superset_cache-staging
     restart: unless-stopped
     volumes:
-      - redis:/data
+      - redis-staging:/data
     networks:
       - external_network
 
-  db:
+  db-staging:
     env_file: .env
     image: postgres:15
     container_name: superset_db-staging
     restart: unless-stopped
     volumes:
-      - ${SUPERSET_DB_VOLUME:-db_home}:/var/lib/postgresql/data
+      - ${SUPERSET_DB_VOLUME:-db_home-staging}:/var/lib/postgresql/data
       # - ./docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     networks:
       - external_network
 
-  superset:
+  superset-staging:
     env_file: .env
     build:
       <<: *common-build
@@ -43,13 +43,13 @@ services:
     user: "root"
     restart: unless-stopped
     ports:
-      - ${SUPERSET_PORT:-8088}:8088
+      - ${SUPERSET_PORT_PROXY:-8088}:8088
     depends_on: *superset-depends-on
     volumes: *superset-volumes
     networks:
       - external_network
 
-  superset-init:
+  superset-init-staging:
     container_name: superset_init-staging
     build:
       <<: *common-build
@@ -63,7 +63,7 @@ services:
     networks:
       - external_network
 
-  superset-worker:
+  superset-worker-staging:
     build:
       <<: *common-build
     container_name: superset_worker-staging
@@ -82,7 +82,7 @@ services:
     networks:
       - external_network
 
-  superset-worker-beat:
+  superset-worker-beat-staging:
     build:
       <<: *common-build
     container_name: superset_worker_beat-staging
@@ -103,9 +103,9 @@ networks:
     external: true
 
 volumes:
-  superset_home:
+  superset_home-staging:
     external: false
-  db_home:
+  db_home-staging:
     external: false
-  redis:
+  redis-staging:
     external: false
