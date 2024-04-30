@@ -11,6 +11,8 @@ from flask_caching.backends.filesystemcache import FileSystemCache
 
 SUPERSET_DOCKER_CONTAINER = os.getenv("SUPERSET_DOCKER_CONTAINER", "superset")
 ENABLE_PROXY_FIX = os.getenv("ENABLE_PROXY_FIX")
+# SECRET_KEY = os.getenv("SUPSERSET_SECRET_KEY")
+# PREVIOUS_SECRET_KEY = os.getenv("SUPSERSET_PREVIOUS_SECRET_KEY")
 
 DATABASE_DIALECT = os.getenv("DATABASE_DIALECT")
 DATABASE_USER = os.getenv("DATABASE_USER")

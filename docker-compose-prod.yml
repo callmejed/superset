@@ -43,7 +43,7 @@ services:
     user: "root"
     restart: unless-stopped
     ports:
-      - ${SUPERSET_PORT:-8088}:8088
+      - ${SUPERSET_PORT_PROXY:-8088}:8088
     depends_on: *superset-depends-on
     volumes: *superset-volumes
     networks:
