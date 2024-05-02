@@ -1,3 +1,4 @@
+x-superset-image: &superset-image apachesuperset.docker.scarf.sh/apache/superset:${DOCKER_TAG:-latest}
 x-superset-depends-on: &superset-depends-on
   - db-staging
   - redis-staging
@@ -36,8 +37,9 @@ services:
 
   superset-staging:
     env_file: .env
-    build:
-      <<: *common-build
+    # build:
+    #   <<: *common-build
+    image: *superset-image
     container_name: superset_app-staging
     command: ["/app/docker/docker-bootstrap.sh", "app-gunicorn"]
     user: "root"
@@ -51,8 +53,9 @@ services:
 
   superset-init-staging:
     container_name: superset_init-staging
-    build:
-      <<: *common-build
+    # build:
+    #   <<: *common-build
+    image: *superset-image
     command: ["/app/docker/docker-init.sh"]
     env_file: .env
     depends_on: *superset-depends-on
@@ -64,8 +67,9 @@ services:
       - external_network
 
   superset-worker-staging:
-    build:
-      <<: *common-build
+    # build:
+    #   <<: *common-build
+    image: *superset-image
     container_name: superset_worker-staging
     command: ["/app/docker/docker-bootstrap.sh", "worker"]
     env_file: .env
@@ -83,8 +87,9 @@ services:
       - external_network
 
   superset-worker-beat-staging:
-    build:
-      <<: *common-build
+    # build:
+    #   <<: *common-build
+    image: *superset-image
     container_name: superset_worker_beat-staging
     command: ["/app/docker/docker-bootstrap.sh", "beat"]
     env_file: .env
